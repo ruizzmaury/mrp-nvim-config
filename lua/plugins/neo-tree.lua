@@ -6,8 +6,5 @@ return {
     "MunifTanjim/nui.nvim",
     "nvim-tree/nvim-web-devicons", 
   },
-  config = function()
-    vim.keymap.set('n','<C-n>', ':Neotree filesystem reveal right<CR>', {})
-  end,
   lazy = false, -- neo-tree will lazily load itself
 }
