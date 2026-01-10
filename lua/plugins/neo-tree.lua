@@ -4,7 +4,10 @@ return {
   dependencies = {
     "nvim-lua/plenary.nvim",
     "MunifTanjim/nui.nvim",
-    "nvim-tree/nvim-web-devicons", 
+    "nvim-tree/nvim-web-devicons",
   },
+  config = function()
+    vim.keymap.set('n','<C-n>', ':Neotree filesystem reveal left<CR>', {})
+  end,
   lazy = false, -- neo-tree will lazily load itself
 }
