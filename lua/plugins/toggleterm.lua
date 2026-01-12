@@ -16,54 +16,72 @@ return {
   config = function(_, opts)
     require("toggleterm").setup(opts)
 
-    -- Terminal-only keymaps
+    -- Terminal-only keymaps (robust on macOS)
     vim.api.nvim_create_autocmd("TermOpen", {
       pattern = "term://*toggleterm#*",
       callback = function()
-        local keymap_opts = { buffer = 0 }
-        vim.keymap.set("t", "<esc>", [[<C-\><C-n>]], keymap_opts)
-        vim.keymap.set("t", "<C-h>", "<cmd>wincmd h<CR>", keymap_opts)
-        vim.keymap.set("t", "<C-j>", "<cmd>wincmd j<CR>", keymap_opts)
-        vim.keymap.set("t", "<C-k>", "<cmd>wincmd k<CR>", keymap_opts)
-        vim.keymap.set("t", "<C-l>", "<cmd>wincmd l<CR>", keymap_opts)
+        local opts = { buffer = 0, silent = true }
+
+        -- Exit terminal mode
+        vim.keymap.set("t", "<esc>", [[<C-\><C-n>]], opts)
+
+        -- Safe split navigation from terminal buffers
+        vim.keymap.set("t", "<C-h>", [[<C-\><C-n><C-w>h]], opts)
+        vim.keymap.set("t", "<BS>",  [[<C-\><C-n><C-w>h]], opts) -- macOS: Ctrl+h often maps to Backspace
+        vim.keymap.set("t", "<C-j>", [[<C-\><C-n><C-w>j]], opts)
+        vim.keymap.set("t", "<C-k>", [[<C-\><C-n><C-w>k]], opts)
+        vim.keymap.set("t", "<C-l>", [[<C-\><C-n><C-w>l]], opts)
       end,
     })
 
+    -- Split navigation from normal mode
+    vim.keymap.set("n", "<C-h>", "<C-w>h", { silent = true })
+    vim.keymap.set("n", "<C-j>", "<C-w>j", { silent = true })
+    vim.keymap.set("n", "<C-k>", "<C-w>k", { silent = true })
+    vim.keymap.set("n", "<C-l>", "<C-w>l", { silent = true })
+
     local Terminal = require("toggleterm.terminal").Terminal
 
-    -- LazyDocker (floating)
-    local lazydocker = Terminal:new({
-      cmd = "lazydocker",
-      direction = "float",
-      hidden = true,
-    })
-
-    function _LAZYDOCKER_TOGGLE()
-      lazydocker:toggle()
-    end
-
-    -- Claude Code (vertical, persistent)
+    -- Claude Code (persistent vertical terminal)
     local claude = Terminal:new({
       cmd = "claude",
       direction = "vertical",
       hidden = true,
     })
 
-    function _CLAUDE_TOGGLE()
+    -- Vertical shell
+    local term1 = Terminal:new({
+      direction = "vertical",
+      hidden = true,
+    })
+
+    -- Horizontal shell
+    local term2 = Terminal:new({
+      direction = "horizontal",
+      hidden = true,
+    })
+
+    -- Floating shell
+    local floating = Terminal:new({
+      direction = "float",
+      hidden = true,
+    })
+
+    -- Explicit, predictable keymaps
+    vim.keymap.set("n", "<leader>ta", function()
       claude:toggle()
-    end
+    end, { desc = "Claude Code" })
 
-    -- Keymaps
-    vim.keymap.set("n", "<leader>tt", "<cmd>ToggleTerm direction=vertical<CR>", {
-      desc = "Terminal",
-    })
+    vim.keymap.set("n", "<leader>t1", function()
+      term1:toggle()
+    end, { desc = "Vertical terminal" })
 
-    vim.keymap.set("n", "<leader>td", _LAZYDOCKER_TOGGLE, {
-      desc = "LazyDocker",
-    })
+    vim.keymap.set("n", "<leader>t2", function()
+      term2:toggle()
+    end, { desc = "Horizontal terminal" })
 
-    vim.keymap.set("n", "<leader>ta", _CLAUDE_TOGGLE, {
-      desc = "Claude Code",
-    })
+    vim.keymap.set("n", "<leader>tf", function()
+      floating:toggle()
+    end, { desc = "Floating terminal" })
   end,
 }
