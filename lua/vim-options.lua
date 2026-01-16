@@ -28,3 +28,5 @@ vim.fn.sign_define("DiagnosticSignHint",  {text = "", texthl="DiagnosticSignH
 
 vim.keymap.set("n", "<Esc>", ":nohlsearch<CR>", { silent = true })
 vim.opt.splitright = true
+vim.keymap.set("v", ">", ">gv")
+vim.keymap.set("v", "<", "<gv")
