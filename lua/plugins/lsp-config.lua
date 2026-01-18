@@ -1,21 +1,32 @@
 return {
+  -- Mason: instala binarios LSP
   {
     "williamboman/mason.nvim",
     config = function()
       require("mason").setup()
     end,
   },
+
+  -- Mason bridge
   {
     "williamboman/mason-lspconfig.nvim",
     config = function()
       require("mason-lspconfig").setup({
-        ensure_installed = { "lua_ls", "ts_ls", "gopls", "rust_analyzer" },
+        ensure_installed = {
+          "lua_ls",
+          "gopls",
+          "rust_analyzer",
+          "ts_ls",
+        },
       })
     end,
   },
+
+  -- LSP core (API nueva Neovim 0.11)
   {
     "neovim/nvim-lspconfig",
     config = function()
+      -- Lua (Neovim)
       vim.lsp.config.lua_ls = {
         settings = {
           Lua = {
@@ -26,8 +37,25 @@ return {
         },
       }
 
-      vim.lsp.enable("lua_ls")
+      vim.lsp.config.gopls = {
+        settings = {
+          gopls = {
+            semanticTokens = true,
+            analyses = {
+              unusedparams = true,
+            },
+            staticcheck = true,
+          },
+        },
+      }
 
+      -- Enable servers
+      vim.lsp.enable("lua_ls")
+      vim.lsp.enable("gopls")
+      vim.lsp.enable("rust_analyzer")
+      vim.lsp.enable("ts_ls")
+
+      -- Keymaps LSP
       vim.keymap.set("n", "K", vim.lsp.buf.hover, {})
       vim.keymap.set("n", "gd", vim.lsp.buf.definition, {})
       vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, {})

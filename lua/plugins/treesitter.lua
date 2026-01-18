@@ -4,7 +4,9 @@ return {
   build = ":TSUpdate",
   opts = {
     ensure_installed = { "rust", "javascript", "zig", "go" },
-    highlight = { enable = true },
+    highlight = {
+      enable = true,
+    },
     indent = { enable = true },
   },
 }
